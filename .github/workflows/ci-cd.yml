@@ -37,7 +37,13 @@ jobs:
 
       - name: Docker Build
         if: github.event_name == 'push'
-        run: docker build -t ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+        env:
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          OWNER_LC=$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_REF=ghcr.io/${OWNER_LC}/${{ env.IMAGE_NAME }}" >> "$GITHUB_ENV"
+          docker build -t "ghcr.io/${OWNER_LC}/${{ env.IMAGE_NAME }}:${{ github.sha }}" \
+                       -t "ghcr.io/${OWNER_LC}/${{ env.IMAGE_NAME }}:latest" .
 
       - name: Login to GHCR
         if: github.event_name == 'push'
@@ -50,10 +56,8 @@ jobs:
       - name: Push to GHCR
         if: github.event_name == 'push'
         run: |
-          docker tag ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
-          docker push ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          docker push ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+          docker push "${IMAGE_REF}:${{ github.sha }}"
+          docker push "${IMAGE_REF}:latest"
 
       # --- Azure Container Apps / Web App deploy (enable when secrets are configured) ---
       # - name: Azure Login
