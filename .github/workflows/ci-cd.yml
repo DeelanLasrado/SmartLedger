@@ -1,0 +1,71 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+env:
+  DOTNET_VERSION: "8.0.x"
+  IMAGE_NAME: smartledger-api
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore SmartLedger.sln
+
+      - name: Build
+        run: dotnet build SmartLedger.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test SmartLedger.sln --configuration Release --no-build --verbosity normal
+
+      - name: Docker Build
+        if: github.event_name == 'push'
+        run: docker build -t ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+
+      - name: Login to GHCR
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push to GHCR
+        if: github.event_name == 'push'
+        run: |
+          docker tag ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+          docker push ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+
+      # --- Azure Container Apps / Web App deploy (enable when secrets are configured) ---
+      # - name: Azure Login
+      #   if: github.event_name == 'push' && secrets.AZURE_CREDENTIALS != ''
+      #   uses: azure/login@v2
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+      #
+      # - name: Deploy to Azure Container Apps
+      #   if: github.event_name == 'push' && secrets.AZURE_CONTAINER_APP_NAME != ''
+      #   uses: azure/container-apps-deploy-action@v1
+      #   with:
+      #     imageToDeploy: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+      #     containerAppName: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
+      #     resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
