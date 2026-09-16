@@ -4,6 +4,13 @@
 
 SmartLedger helps kirana stores, traders, and small businesses digitize invoice intake, detect spend anomalies, reconcile GST (GSTR-2A vs GSTR-3B), answer finance questions with RAG, and forecast cash flow — without requiring Azure AI credentials for local demos.
 
+## Live demo
+
+| | |
+|---|---|
+| **API / Swagger** | https://smartledger-api-deelan.azurewebsites.net/swagger |
+| **Demo login** | `demo@smartledger.local` / `Demo@12345` |
+
 ## Problem
 
 Indian SMBs drown in paper invoices, miss GST mismatches, and lack cash-flow visibility. Accountants spend hours on data entry; owners discover tax issues too late. SmartLedger turns invoices into structured, queryable, compliance-ready data in seconds.
