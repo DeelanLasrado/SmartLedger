@@ -27,3 +27,5 @@ README.md
 docs
 **/*.md
 SmartLedger.Tests
+smartledger-web/node_modules
+smartledger-web/dist

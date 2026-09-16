@@ -87,6 +87,9 @@ app.UseHangfireDashboard(hangfirePath, new DashboardOptions
 
 app.MapControllers();
 
+// SPA: serve React app from wwwroot; keep API/Swagger/Hangfire intact.
+app.MapFallbackToFile("index.html");
+
 await SeedDemoDataAsync(app);
 
 app.Run();

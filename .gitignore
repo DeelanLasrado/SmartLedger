@@ -208,6 +208,7 @@ $RECYCLE.BIN/
 
 # Node
 node_modules/
+smartledger-web/dist/
 
 # Python
 __pycache__/

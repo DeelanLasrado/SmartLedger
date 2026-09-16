@@ -8,8 +8,26 @@ SmartLedger helps kirana stores, traders, and small businesses digitize invoice 
 
 | | |
 |---|---|
-| **API / Swagger** | https://smartledger-api-deelan.azurewebsites.net/swagger |
+| **App** | https://smartledger-api-deelan.azurewebsites.net |
+| **Swagger** | https://smartledger-api-deelan.azurewebsites.net/swagger |
 | **Demo login** | `demo@smartledger.local` / `Demo@12345` |
+
+## Frontend
+
+React (Vite) UI lives in `smartledger-web/` and builds into `SmartLedger.API/wwwroot`.
+
+```bash
+cd smartledger-web
+npm install
+npm run build
+dotnet run --project ../SmartLedger.API
+```
+
+Local Vite proxy (API on port 5205):
+
+```bash
+cd smartledger-web && npm run dev
+```
 
 ## Problem
 
